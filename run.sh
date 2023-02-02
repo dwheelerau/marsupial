@@ -29,10 +29,7 @@ while getopts ":i:m:o:h" opt; do
     esac
 done
 
-echo $model
-echo $image_dir
-echo $out_dir
-
+# run the model
 python prediction_batch.py -m $model -i $image_dir -o $out_dir
 
 # unset or will cause stability issues
