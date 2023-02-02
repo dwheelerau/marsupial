@@ -3,6 +3,10 @@
 # ImportError: /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.26' not found
 export LD_LIBRARY_PATH=/media/dwheeler/spinner/Linux_space/miniconda3/envs/marsupial/lib:$LD_LIBRARY_PATH
 
+# defaults
+out_dir="processed_images"
+model="weights/marsupial_72s.pt"
+
 Help()
 {
    # Display Help
@@ -15,7 +19,7 @@ Help()
    echo "h     Print this Help."
 }
 
-while getopts ":i:o:m:h" opt; do
+while getopts ":i:m:o:h" opt; do
     case ${opt} in
         i ) image_dir=${OPTARG};;
         o ) out_dir=${OPTARG};;
@@ -24,6 +28,7 @@ while getopts ":i:o:m:h" opt; do
             exit;;
     esac
 done
+
 echo $model
 echo $image_dir
 echo $out_dir

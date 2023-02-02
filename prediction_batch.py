@@ -24,15 +24,27 @@ import torchvision
 import matplotlib.pyplot as plt
 
 args_parser = argparse.ArgumentParser()
-args_parser.add_argument("-m", "--model", help="path to marsupial.ai model", 
+
+args_parser.add_argument("-m", "--model", help="path to marsupial.ai model",
                         default="weights/marsupial_72s.pt")
-args_parser.add_argument("-i", "--image_dir", help="folder of images to analyse", 
-                        required=True)
 args_parser.add_argument("-o", "--out_dir", help="output directory for bbox images", 
+                        default="processed_images")
+args_parser.add_argument("-i", "--image_dir", help="folder of images to analyse", 
                         required=True)
 
 args = args_parser.parse_args()
-#print(args.model)
+print("model being used is:")
+print(args.model)
+
+
+
+
+
+# create the outdir if it does not exist
+try:
+    os.mkdir(args.out_dir)
+except FileExistsError:
+    pass
 
 model = torch.hub.load('ultralytics/yolov5', 'custom', args.model)
 
@@ -54,12 +66,14 @@ def predict_images(image_dir, out_dir, summary = True):
         
         # keep the outputs orgainsed in case of name clashes
         bbox_dir = os.path.join(out_dir, os.path.dirname(im))
+        bbox_file = os.path.basename(im).lower().replace(".jpg",
+                                                         "_detections.jpg")
         try:
             os.mkdir(bbox_dir)
         except FileExistsError:
             pass
 
-        outfile=os.path.join(bbox_dir, os.path.basename(im))
+        outfile=os.path.join(bbox_dir, bbox_file)
         plt.savefig(outfile)
     
         prediction = results.pandas().xyxy[0]
