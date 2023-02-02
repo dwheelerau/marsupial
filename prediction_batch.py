@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# ImportError: /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.26' not found
-#export LD_LIBRARY_PATH=/media/dwheeler/spinner/Linux_space/miniconda3/envs/marsupial/lib:$LD_LIBRARY_PATH
-
 import argparse
 
 import os
@@ -35,10 +32,6 @@ args_parser.add_argument("-i", "--image_dir", help="folder of images to analyse"
 args = args_parser.parse_args()
 print("model being used is:")
 print(args.model)
-
-
-
-
 
 # create the outdir if it does not exist
 try:
