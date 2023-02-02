@@ -1,5 +1,13 @@
 # [marsupial.ai](http://marsupial.ai)
 
+# Edit: update 2023  
+./run.sh required to overcome bioinc error may not be required with newer version 
+of ubuntu.  
+```
+usage: run.sh -i image_dir [-o out_dir] [-m model.pt]
+```
+The same options can be passed directly to the python script.  
+
 Detect and identify animals in camera traps, up to 1370 times faster than manually, using the power of AI.
 Try the [live demo](https://huggingface.co/spaces/hlydecker/marsupial)!
 
