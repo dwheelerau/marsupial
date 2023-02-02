@@ -2,17 +2,18 @@
 # coding: utf-8
 
 # ImportError: /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.26' not found
-export LD_LIBRARY_PATH=/media/dwheeler/spinner/Linux_space/miniconda3/envs/marsupial/lib:$LD_LIBRARY_PATH
+#export LD_LIBRARY_PATH=/media/dwheeler/spinner/Linux_space/miniconda3/envs/marsupial/lib:$LD_LIBRARY_PATH
 
 import argparse
 
 import os
+
 import re
 import json
 import pathlib
 import subprocess
 import torch
-#import pandas as pd
+import pandas as pd
 import numpy as np
 from tqdm import tqdm
 from pathlib import Path 
@@ -20,66 +21,37 @@ from PIL import Image
 from datetime import datetime
 
 import torchvision
+import matplotlib.pyplot as plt
 
 args_parser = argparse.ArgumentParser()
 args_parser.add_argument("-m", "--model", help="path to marsupial.ai model", 
                         default="weights/marsupial_72s.pt")
+args_parser.add_argument("-i", "--image_dir", help="folder of images to analyse", 
+                        required=True)
+args_parser.add_argument("-o", "--out_dir", help="folder of images to analyse", 
+                        default="./")
 
 args = args_parser.parse_args()
-print(args.model)
+#print(args.model)
 
 model = torch.hub.load('ultralytics/yolov5', 'custom', args.model)
-'''
-
-# In[ ]:
 
 
-
-
-
-# Once the model is loaded, we can pass objects to it and save them in memory as predictions. 
-
-# In[4]:
-
-
-# Specify the path to an image file to predict on
-#image = "data/*"
-image = "data/koala1.jpeg"
-#image = "data/koala2.jpg"
-#image = "data/australian_magpie.jpg"
-
-# Pass the image path to our model
-results = model(image)
-
-# If we print the result, we can see what we get and how long it took to process
-print(results)
+#image = "data/koala1.jpeg"
+#results = model(image)
+#print(results)
 
 # OR we can print this as a nice dataframe:
-results.pandas()
-results.xyxy[0]  # im predictions (tensor)
-results.pandas().xyxy[0]  # im predictions (pandas)
+#results.pandas()
+#results.xyxy[0]  # im predictions (tensor)
+#results.pandas().xyxy[0]  # im predictions (pandas)
 
+#get_ipython().run_line_magic('matplotlib', 'inline')
+#fig, ax = plt.subplots(figsize=(16, 12))
+#ax.imshow(results.render()[0])
+#plt.show()
 
-# Our model has found one koala in the image; let's visualise the model's predictions to see if they look reasoable:
-
-# In[5]:
-
-
-get_ipython().run_line_magic('matplotlib', 'inline')
-fig, ax = plt.subplots(figsize=(16, 12))
-ax.imshow(results.render()[0])
-plt.show()
-
-
-# That looks pretty good! The model has drawn a bounding box perfectly covering the one animal in this image, which looks to pretty clearly be a Koala walking along the ground.
-# 
 # #### Building functions with marsupial's models
-# 
-# Now that we can make a prediction on one single image, we can then build some functions to allow us to make predictions on multiple images.
-# We can also make functions to help us visualise and summarise results.
-
-# In[6]:
-
 
 """
 Prediction functions
@@ -92,7 +64,8 @@ def predict_single_image(image_file):
     results.pandas().xyxy[0] 
     fig, ax = plt.subplots(figsize=(16, 12))
     ax.imshow(results.render()[0])
-    plt.show()
+    outfile="./"+im
+    plt.save(outfile)
     
     return(results.pandas().xyxy[0])
 
@@ -162,81 +135,13 @@ def time_from_exif(image_file):
     return(time)
 
 
-# We can then pass a path to a directory containing images, and this function will recursively look for any images, load them in, and make predictions on all of the images using our model.
-# 
-# Predictions will then be saved into a `pandas` dataframe, which can be analysed in Python or easily exported into a spreadsheet for analysis using other tools like R or Excel,
 
-# In[80]:
-
-
-#predictions = predict_images("data") 
+predictions = predict_images(image_dir=args.image_dir) 
 #predictions
 
-
-# We can also print out a summary of the number of observations for each species detected:
-
-# In[8]:
-
-
 # We can enable printing a summary by setting summary to True
-predictions = predict_images("data", summary = True) 
+#predictions = predict_images("data", summary = True) 
 
-# OR we can always just do it ourselves with the output of predict_images:
-# print(predictions.groupby(['name'])['name'].count().sort_values(ascending=False))
-
-
-# In[7]:
-
-
-predictions = predict_images("data/") 
+#predictions = predict_images("data/") 
  
-predictions
-
-
-# ### Gradio web applications
-# 
-# Here's an example of simple web application that can use one of our models to make predictions on input images:
-
-# In[85]:
-
-
-# Marsupial Demo
-import gradio as gr
-import torch
-import torchvision
-import numpy as np
-from PIL import Image
-
-# Load Marsupial model
-# TODO: Allow user selectable model?
-
-model = torch.hub.load('ultralytics/yolov5:v6.2', 'custom', "weights/marsupial_72s_lures.pt", trust_repo=True)
-
-def yolo(im, size=640):
-    g = (size / max(im.size))  # gain
-    im = im.resize((int(x * g) for x in im.size))  # resize
-    
-    #model = torch.hub.load('ultralytics/yolov5', 'custom', "weights/marsupial_72s_lures.pt")
-    
-    results = model(im)  # inference
-    results.render()  # updates results.imgs with boxes and labels
-    result = Image.fromarray(results.imgs[0])
-    return result
-
-inputs = gr.Image(type="pil", label="Input Image")
-outputs = gr.Image(type="pil", label="Output Image")
-
-title = "Marsupial"
-description = "Detect and identify 72 different species of Australian wildlife using Marsupial's most detailed model"
-article = "<p style='text-align: center'>This app makes predictions using a YOLOv5s model that was trained to detect and identify 72 different species of animals found in Australia in camera trap images; find out more about the project on <a href='https://github.com/Sydney-Informatics-Hub/marsupial'>GitHub</a>. This app was built by Dr Henry Lydecker and Dr Gordon MacDonald at the Sydney Informatics Hub, a Core Research Facility at the University of Sydney. Find out more about the YOLO model from the original creator, <a href='https://pjreddie.com/darknet/yolo/'>Joseph Redmon</a>. YOLOv5 is a family of compound-scaled object detection models trained on the COCO dataset and developed by Ultralytics, and includes simple functionality for Test Time Augmentation (TTA), model ensembling, hyperparameter evolution, and export to ONNX, CoreML and TFLite. <a href='https://github.com/ultralytics/yolov5'>Source code</a> | <a href='https://pytorch.org/hub/ultralytics_yolov5'>PyTorch Hub</a></p>"
-
-examples = [['data/eastern_grey_kangaroo.jpg'],['data/red_fox.jpg'], ['data/koala2.jpg'],['data/cat1.jpg']]
-
-gr.Interface(yolo, inputs, outputs, title=title, description=description, article=article, examples=examples, theme="default").launch(enable_queue=True)
-
-
-# In[ ]:
-
-
-
-'''
+#predictions
