@@ -58,11 +58,12 @@ def predict_images(image_dir, out_dir, summary = True):
         ax.imshow(results.render()[0])
         
         # keep the outputs orgainsed in case of name clashes
-        bbox_dir = os.path.join(out_dir, os.path.dirname(im))
+        # remove leading slash from im dirname to get join to work
+        bbox_dir = os.path.join(out_dir, os.path.dirname(im)[1:])
         bbox_file = os.path.basename(im).lower().replace(".jpg",
                                                          "_detections.jpg")
         try:
-            os.mkdir(bbox_dir)
+            os.makedirs(bbox_dir)
         except FileExistsError:
             pass
 
