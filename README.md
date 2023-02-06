@@ -1,13 +1,16 @@
 # [marsupial.ai](http://marsupial.ai)
 
 # Edit: update 2023  
-./run.sh required to overcome bioinc error may not be required with newer version 
-of ubuntu.  
+./run.sh required to overcome Ubuntu bionc library missing error (should not be required with newer version 
+of ubuntu).  
 ```
 usage: run.sh -i image_dir [-o out_dir] [-m model.pt]
 ```
 The same options can be passed directly to the python script.  
 
+The `process_batch.py` script creates bbox images and handles the job.  
+
+# Original introduction  
 Detect and identify animals in camera traps, up to 1370 times faster than manually, using the power of AI.
 Try the [live demo](https://huggingface.co/spaces/hlydecker/marsupial)!
 
