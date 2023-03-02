@@ -38,7 +38,8 @@ try:
     os.mkdir(args.out_dir)
 except FileExistsError:
     pass
-
+#https://stackoverflow.com/questions/68901236/urllib-error-httperror-http-error-403-rate-limit-exceeded-when-loading-resnet1
+torch.hub._validate_not_a_forked_repo=lambda a,b,c: True
 model = torch.hub.load('ultralytics/yolov5', 'custom', args.model)
 
 def predict_images(image_dir, out_dir, summary = True):
