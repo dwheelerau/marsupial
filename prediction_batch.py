@@ -67,7 +67,7 @@ def predict_images(image_dir, out_dir, summary = True):
         
         bbox_dir = out_dir / image_dir_name
         bbox_file = os.path.basename(im).lower().replace(".jpg",
-                                                         "_detections.jpg")
+                                                         "_detections.jpg").replace(".JPG","_detections.jpg")
         try:
             os.makedirs(bbox_dir)
         except FileExistsError:
