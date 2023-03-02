@@ -53,14 +53,19 @@ def predict_images(image_dir, out_dir, summary = True):
                      if os.path.splitext(f.lower())[1] == '.jpg']
     
     for im in tqdm(target_images): #tqdm(image_dir.glob("*.jpg")):
-        results = model(im)
+        try:
+            results = model(im)
+        except OSError:
+            print("Image file %s is broken, skipping!" % im)
         results.pandas().xyxy[0] 
         fig, ax = plt.subplots(figsize=(16, 12))
         ax.imshow(results.render()[0])
         
-        # keep the outputs orgainsed in case of name clashes
         # remove leading slash from im dirname to get join to work
-        bbox_dir = os.path.join(out_dir, os.path.dirname(im)[1:])
+        out_dir = Path(out_dir)
+        image_dir_name = Path(os.path.dirname(im))
+        
+        bbox_dir = out_dir / image_dir_name
         bbox_file = os.path.basename(im).lower().replace(".jpg",
                                                          "_detections.jpg")
         try:
